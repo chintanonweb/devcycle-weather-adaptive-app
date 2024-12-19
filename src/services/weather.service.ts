@@ -9,22 +9,31 @@ const weatherAPI = axios.create({
   },
 });
 
-export const fetchWeatherData = async (): Promise<WeatherData> => {
+export const fetchWeatherData = async (query?: string): Promise<WeatherData> => {
   try {
-    // First try to get location using geolocation
-    const position = await getCurrentPosition();
-    const query = position 
-      ? `${position.coords.latitude},${position.coords.longitude}`
-      : 'auto:ip';
+    let locationQuery: string;
+
+    if (query) {
+      locationQuery = query;
+    } else {
+      try {
+        const position = await getCurrentPosition();
+        locationQuery = `${position.coords.latitude},${position.coords.longitude}`;
+      } catch (error) {
+        console.warn('Geolocation failed, falling back to IP-based location');
+        locationQuery = 'auto:ip';
+      }
+    }
 
     const response = await weatherAPI.get('/current.json', {
-      params: { q: query },
+      params: { q: locationQuery },
     });
     
     const { current, location } = response.data;
     return {
       current: {
         temp_c: current.temp_c,
+        temp_f: current.temp_f,
         condition: {
           text: current.condition.text,
           code: current.condition.code

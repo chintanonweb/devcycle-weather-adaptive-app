@@ -3,9 +3,10 @@ import { WeatherData } from '../types/weather';
 
 interface WeatherInfoProps {
   weather: WeatherData | null;
+  unit: 'C' | 'F';
 }
 
-const WeatherInfo: React.FC<WeatherInfoProps> = ({ weather }) => {
+const WeatherInfo: React.FC<WeatherInfoProps> = ({ weather, unit }) => {
   if (!weather) return null;
 
   return (
